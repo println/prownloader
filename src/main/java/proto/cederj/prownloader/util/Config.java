@@ -1,19 +1,3 @@
-package proto.cederj.prownloader.util;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import proto.cederj.prownloader.App;
-
 /*
  * Copyright 2015 Felipe Santos <live.proto at hotmail.com>.
  *
@@ -29,6 +13,17 @@ import proto.cederj.prownloader.App;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package proto.cederj.prownloader.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.TreeSet;
+
 /**
  *
  * @author Felipe Santos <live.proto at hotmail.com>
