@@ -26,12 +26,15 @@ import proto.cederj.prownloader.thirdparty.pseudohttpclient.PseudoHttpClient;
 public class RioServerResolver {
 
     private final PseudoHttpClient client;
-    private final String RESOURCE_REDIRECTOR_SERVER = "/serverredirect.rio";
-    private final String RESOURCE_RIO_TRANSFER = "/riotransfer";
-    private final String XML_RIO_SERVER_TAGNAME = "rioserverredirect";
+    private final String redirector;
+    private final String transfer;
+    private final String xmlTagName;
 
-    public RioServerResolver(PseudoHttpClient client) {
+    public RioServerResolver(PseudoHttpClient client, String redirector, String transfer, String xmlTagName) {
         this.client = client;
+        this.redirector = redirector;
+        this.transfer = transfer;
+        this.xmlTagName = xmlTagName;
     }
 
     public String getDefaultXml(String link) throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
@@ -71,12 +74,12 @@ public class RioServerResolver {
     private String resolveMirror(String host) throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        InputStream inputStream = client.doGet(host + RESOURCE_REDIRECTOR_SERVER);        
+        InputStream inputStream = client.doGet(host + redirector);
         Document doc = db.parse(inputStream);
         doc.getDocumentElement().normalize();
-        NodeList nodeLst = doc.getElementsByTagName(XML_RIO_SERVER_TAGNAME);
+        NodeList nodeLst = doc.getElementsByTagName(xmlTagName);
         Node node = nodeLst.item(0);
-        String server = node.getTextContent() + RESOURCE_RIO_TRANSFER;
+        String server = node.getTextContent() + transfer;
         return server;
     }
 }

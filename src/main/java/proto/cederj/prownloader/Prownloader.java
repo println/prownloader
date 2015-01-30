@@ -45,8 +45,8 @@ public class Prownloader implements DownloadMonitor {
         //getMetadata(course);
         //getVideoFile(course);
     }
-    
-    private void getAllMetaData(List<Course> list) throws Exception{
+
+    private void getAllMetaData(List<Course> list) throws Exception {
         for (Course course : list) {
             System.out.print("\n-------");
             System.out.print(course.getName());
@@ -65,7 +65,7 @@ public class Prownloader implements DownloadMonitor {
     private void getMetadata(Lesson lesson) throws Exception {
         Config config = new Config();
         PseudoHttpClient client = new GenericPseudoHttpClient(config.getUserAgent());
-        RioServerResolver resolver = new RioServerResolver(client);
+        RioServerResolver resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
         String xml = resolver.getDefaultXml(lesson.getSourceUrl());
         InputStream is = client.doGet(xml);
         FacadeRioXmlDecompiler decompile = new FacadeRioXmlDecompiler(is);
@@ -103,7 +103,7 @@ public class Prownloader implements DownloadMonitor {
     private void getVideoFile(Lesson lesson, File folder) throws Exception {
         Config config = new Config();
         PseudoHttpClient client = new GenericPseudoHttpClient(config.getUserAgent());
-        RioServerResolver resolver = new RioServerResolver(client);
+        RioServerResolver resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
         String videoFileName = lesson.getRelatedVideos().get(0).getFilename();
         String videoUrl = resolver.getFile(lesson.getSourceUrl(), videoFileName);
         String[] temp = videoFileName.split("\\.");
