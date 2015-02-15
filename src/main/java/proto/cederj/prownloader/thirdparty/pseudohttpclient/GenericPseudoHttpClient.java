@@ -59,6 +59,8 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
 
     @Override
     public void doDownload(String url, File output, DownloadMonitor monitor) throws IOException {
+        monitor = new DownloadMonitorWrapper(monitor);
+
         HttpGet get = new HttpGet(url);
         HttpResponse response = client.execute(get);
 
@@ -71,18 +73,23 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
 
         Header[] headers = response.getHeaders("Content-Length");
 
-        String s = null;
+        String fileSize = null;
         if (headers.length > 0) {
-            s = headers[0].getValue();
+            fileSize = headers[0].getValue();
         }
-
-        if (output.exists()) {
-            output.delete();
-        }
-
+        
         int size = -1;
-        if (s != null) {
-            size = Integer.parseInt(s);
+        if (fileSize != null) {
+            size = Integer.parseInt(fileSize);
+        }
+        
+        if (output.exists()) {
+            //do not remove/redownload file if it is correct
+            if(output.length() == size){
+                monitor.status(size, size, 100, url);
+                return;
+            }
+            output.delete();
         }
 
         OutputStream outputStream = new FileOutputStream(output);
@@ -101,7 +108,7 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
                     percent = temp;
                     monitor.status(size, current, percent, url);
                 }
-            }else{                
+            } else {
                 monitor.status(size, current, percent, url);
             }
         }

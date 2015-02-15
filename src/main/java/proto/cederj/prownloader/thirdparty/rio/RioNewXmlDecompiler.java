@@ -31,7 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import proto.cederj.prownloader.model.Video;
+import proto.cederj.prownloader.mvp.model.Video;
 
 /**
  *
@@ -86,13 +86,15 @@ public class RioNewXmlDecompiler implements RioXmlDecompiler {
     }
 
     @Override
-    public String getAuthor() throws XPathExpressionException {
+    public List<String> getAuthor() throws XPathExpressionException {
         //<OBAA_Videoaula><lifecycle><contribute><role>author</role><entity>
         XPathExpression expr = xpath.compile("/OBAA_Videoaula/lifecycle/contribute");
         XPathExpression roleexpr = xpath.compile("role");
         XPathExpression entityexpr = xpath.compile("entity");
         NodeList nodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
-
+        
+        List<String> professors = new ArrayList<>();
+        
         for (int i = 0; i < nodes.getLength(); i++) {
             Node n = nodes.item(i);
             NodeList ns = (NodeList) roleexpr.evaluate(n, XPathConstants.NODESET);
@@ -101,12 +103,12 @@ public class RioNewXmlDecompiler implements RioXmlDecompiler {
                 ns = (NodeList) entityexpr.evaluate(n, XPathConstants.NODESET);
                 String entity = ns.item(0).getTextContent();
                 if (entity != null && !entity.toLowerCase().contains("cederj")) {
-                    entity = entity.replace("BEGIN:VCARD\\nFN:","").replace("END:VCARD\\n", "");
-                    return entity;
+                    entity = entity.replace("BEGIN:VCARD\\nFN:", "").replace("END:VCARD\\n", "");
+                    professors.add(entity);
                 }
             }
         }
-        return null;
+        return professors;
     }
 
     @Override
@@ -211,5 +213,10 @@ public class RioNewXmlDecompiler implements RioXmlDecompiler {
 
         }
         return videos;
+    }
+
+    @Override
+    public int getSourceVersion() {
+        return 1;
     }
 }

@@ -13,66 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package proto.cederj.prownloader;
+package proto.cederj.prownloader.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.lang3.StringUtils;
-import proto.cederj.prownloader.model.Course;
-import proto.cederj.prownloader.model.Lesson;
+import proto.cederj.prownloader.mvp.model.Course;
+import proto.cederj.prownloader.mvp.model.Lesson;
+import proto.cederj.prownloader.mvp.model.Video;
 import proto.cederj.prownloader.thirdparty.pseudohttpclient.DownloadMonitor;
 import proto.cederj.prownloader.thirdparty.pseudohttpclient.GenericPseudoHttpClient;
 import proto.cederj.prownloader.thirdparty.pseudohttpclient.PseudoHttpClient;
 import proto.cederj.prownloader.thirdparty.rio.RioServerResolver;
 import proto.cederj.prownloader.thirdparty.webripper.CederjWebRipper;
 import proto.cederj.prownloader.thirdparty.webripper.WebRipper;
-import proto.cederj.prownloader.util.Config;
 import proto.cederj.prownloader.thirdparty.rio.FacadeRioXmlDecompiler;
 
 /**
  *
  * @author Felipe Santos <live.proto at hotmail.com>
  */
-public class Prownloader implements DownloadMonitor {
+public class DataRipperUtil {
 
-    private List<Course> courses;
-
-    public void initialize() throws Exception {
+    public List<Course> getIndexFromCederj() throws Exception {
         Config config = new Config();
         WebRipper ripper = new CederjWebRipper(config.getUserAgent());
-        courses = ripper.extractFrom(config.getTracker(), config.getTrackerElement());
-
-        getAllMetaData(courses);
-        //Course course = courses.get(2);
-        //getMetadata(course);
-        //getVideoFile(course);
+        List<Course> courses = ripper.extractFrom(config.getTracker(), config.getTrackerElement());
+        return courses;
     }
 
-    private void getAllMetaData(List<Course> list) throws Exception {
-        for (Course course : list) {
-            System.out.print("\n-------");
-            System.out.print(course.getName());
-            System.out.println("-------");
-            getMetadata(course);
+    public void getAllMetaDataFromRio(List<Course> cs) throws Exception {
+        for (Course course : cs) {
+            getMetadataFromRio(course);
         }
     }
 
-    private void getMetadata(Course course) throws Exception {
+    public void getMetadataFromRio(Course course) throws Exception {
         List<Lesson> lessons = course.getLessons();
         for (Lesson lesson : lessons) {
-            getMetadata(lesson);
+            getMetadataFromRio(lesson);
         }
     }
 
-    private void getMetadata(Lesson lesson) throws Exception {
+    public void getMetadataFromRio(Lesson lesson) throws Exception {
         Config config = new Config();
         PseudoHttpClient client = new GenericPseudoHttpClient(config.getUserAgent());
         RioServerResolver resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
@@ -80,61 +67,58 @@ public class Prownloader implements DownloadMonitor {
         InputStream is = client.doGet(xml);
         FacadeRioXmlDecompiler decompile = new FacadeRioXmlDecompiler(is);
         lesson.setTitle(decompile.getTitle());
-        lesson.setAuthor(decompile.getAuthor());
+        lesson.setAuthors(decompile.getAuthor());
         lesson.setDescription(decompile.getDescription());
         lesson.setDuration(decompile.getDuration());
         lesson.setIndexFilename(decompile.getIndexFilename());
         lesson.setKeywords(decompile.getKeywords());
-        lesson.addVideo(decompile.getRelatedVideos());
+        lesson.setVideos(decompile.getRelatedVideos());
         lesson.setSyncFilename(decompile.getSyncFilename());
         lesson.setThumbnailFilename(decompile.getThumbnailFilename());
+        lesson.setSourceVersion(decompile.getSourceVersion());
+        lesson.setUpdated();
 
-        System.out.println(lesson.getTitle());
+        Course course = lesson.getCourse();
+        course.markMetadataUpdateDate();
     }
 
-    private void getVideoFile(Course course) {
-        try {
-            String foldername = course.getCode() + " - " + StringUtils.stripAccents(course.getName());
-            File folder = getFolder(foldername);
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-            List<Lesson> lessons = course.getLessons();
-            for (Lesson lesson : lessons) {
-                //getVideoFile(lesson, folder);
-            }
+    public void getVideoFileFromRio(Course course, DownloadMonitor monitor) throws Exception {
+        String foldername = course.getDefaultFolder();
 
-        } catch (Exception ex) {
-            Logger.getLogger(Prownloader.class.getName()).log(Level.SEVERE, null, ex);
+        List<Lesson> lessons = course.getLessons();
+        for (Lesson lesson : lessons) {
+            getVideoFileFromRio(lesson, foldername, monitor);
         }
-
     }
 
-    private void getVideoFile(Lesson lesson, File folder) throws Exception {
+    public void getVideoFileFromRio(Lesson lesson, String foldername, DownloadMonitor monitor) throws Exception {
         Config config = new Config();
         PseudoHttpClient client = new GenericPseudoHttpClient(config.getUserAgent());
         RioServerResolver resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
-        String videoFileName = lesson.getRelatedVideos().get(0).getFilename();
+
+        Video video = lesson.getRelatedVideos().get(0);
+        String videoFileName = video.getFilename();
         String videoUrl = resolver.getFile(lesson.getSourceUrl(), videoFileName);
         String[] temp = videoFileName.split("\\.");
-        String newVideoFileName = temp[0] + " - " + StringUtils.stripAccents(lesson.getTitle()) + "." + temp[1];
-        File videoFile = new File(folder, newVideoFileName);
+        String localVideoFilename = temp[0] + " - " + StringUtils.stripAccents(lesson.getTitle()) + "." + temp[1];
+        video.setLocalFilename(localVideoFilename);
+        
+        
+        File folder = getFolder(foldername);
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+        File videoFile = new File(folder, localVideoFilename);
 
-        client.doDownload(videoUrl, videoFile, this);
+        client.doDownload(videoUrl, videoFile, monitor);
 
+        Course course = lesson.getCourse();
+        course.markVideoDownloadDate();
     }
 
-    private File getFolder(String foldername) throws URISyntaxException {
+    public File getFolder(String foldername) throws URISyntaxException {
         File base = new File(Config.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
         File folder = new File(base, foldername);
         return folder;
     }
-
-    @Override
-    public void status(long fileSize, long downloaded, int percent, String url) {
-        if (percent == 100) {
-            System.out.println(url);
-        }
-    }
-
 }

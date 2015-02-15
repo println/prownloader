@@ -22,7 +22,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
-import proto.cederj.prownloader.model.Video;
+import proto.cederj.prownloader.mvp.model.Video;
 
 /**
  *
@@ -59,8 +59,8 @@ public class FacadeRioXmlDecompiler implements RioXmlDecompiler {
     }
 
     @Override
-    public String getAuthor() throws XPathExpressionException {
-        return decompiler.getTitle();
+    public  List<String> getAuthor() throws XPathExpressionException {
+        return decompiler.getAuthor();
     }
 
     @Override
@@ -86,5 +86,9 @@ public class FacadeRioXmlDecompiler implements RioXmlDecompiler {
     @Override
     public String getIndexFilename() throws XPathExpressionException {
         return decompiler.getIndexFilename();
+    }
+    @Override
+    public int getSourceVersion() {
+        return decompiler.getSourceVersion();
     }
 }

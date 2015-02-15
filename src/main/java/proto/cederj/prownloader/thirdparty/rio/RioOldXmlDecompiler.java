@@ -34,7 +34,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import proto.cederj.prownloader.model.Video;
+import proto.cederj.prownloader.mvp.model.Video;
 
 /**
  *
@@ -90,14 +90,17 @@ public class RioOldXmlDecompiler implements RioXmlDecompiler {
     }
 
     @Override
-    public String getAuthor() throws XPathExpressionException {
+    public  List<String> getAuthor() throws XPathExpressionException {
         //<rio_object><professor>
         XPathExpression expr = xpath.compile("/rio_object/professor/text()");
         NodeList nodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
+        List<String> professors = new ArrayList<>();
+
         if (nodes.item(0) != null) {
-            return nodes.item(0).getTextContent();
+            professors.add(nodes.item(0).getTextContent());
         }
-        return null;
+
+        return professors;
     }
 
     @Override
@@ -195,6 +198,11 @@ public class RioOldXmlDecompiler implements RioXmlDecompiler {
         return videos;
     }
 
+    @Override
+    public int getSourceVersion() {
+        return 0;
+    }
+
     private String getBitrate() throws XPathExpressionException {
         //<rio_object><bitrate>
         XPathExpression expr = xpath.compile("/rio_object/bitrate/text()");
@@ -229,6 +237,7 @@ public class RioOldXmlDecompiler implements RioXmlDecompiler {
     }
 
     public class BlankingResolver implements EntityResolver {
+
         public InputSource resolveEntity(String arg0, String arg1) throws SAXException, IOException {
             return new InputSource(new ByteArrayInputStream("".getBytes()));
         }

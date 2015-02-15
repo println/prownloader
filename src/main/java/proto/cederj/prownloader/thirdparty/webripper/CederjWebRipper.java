@@ -15,8 +15,8 @@
  */
 package proto.cederj.prownloader.thirdparty.webripper;
 
-import proto.cederj.prownloader.model.Course;
-import proto.cederj.prownloader.model.Lesson;
+import proto.cederj.prownloader.mvp.model.Course;
+import proto.cederj.prownloader.mvp.model.Lesson;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

@@ -18,7 +18,7 @@ package proto.cederj.prownloader.thirdparty.rio;
 
 import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
-import proto.cederj.prownloader.model.Video;
+import proto.cederj.prownloader.mvp.model.Video;
 
 /**
  *
@@ -26,7 +26,7 @@ import proto.cederj.prownloader.model.Video;
  */
 public interface RioXmlDecompiler {
 
-    String getAuthor() throws XPathExpressionException;
+    List<String> getAuthor() throws XPathExpressionException;
 
     String getDescription() throws XPathExpressionException;
 
@@ -43,5 +43,7 @@ public interface RioXmlDecompiler {
     String getThumbnailFilename() throws XPathExpressionException;
 
     String getTitle() throws XPathExpressionException;
+    
+    int getSourceVersion();
     
 }

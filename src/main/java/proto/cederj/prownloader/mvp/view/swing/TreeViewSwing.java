@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package proto.cederj.prownloader.view;
+package proto.cederj.prownloader.mvp.view.swing;
 
 /**
  *
  * @author Felipe Santos <live.proto at hotmail.com>
  */
-public class TreeView extends javax.swing.JPanel {
+public class TreeViewSwing extends javax.swing.JPanel {
 
     /**
      * Creates new form TreeView
      */
-    public TreeView() {
+    public TreeViewSwing() {
         initComponents();
     }
 
