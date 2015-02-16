@@ -21,7 +21,7 @@ import proto.cederj.prownloader.mvp.presenter.MainPresenter;
  *
  * @author Felipe Santos <live.proto at hotmail.com>
  */
-public interface MainView extends EventHandler, CourseView, LessonView {
+public interface MainView extends EventHandler, CourseView, LessonView, NavigatorView {
 
     void setMainPresenter(MainPresenter presenter);
 

@@ -64,21 +64,21 @@ public class CoursePanelSwing extends javax.swing.JPanel implements CourseView {
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel6.setText("professor_list");
 
-        setMaximumSize(new java.awt.Dimension(400, 300));
+        setPreferredSize(new java.awt.Dimension(500, 300));
 
-        labelCourseName.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        //labelCourseName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         labelCourseName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelCourseName.setText("Nome do Curso");
 
-        labelLessonsAmount.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelLessonsAmount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        //labelLessonsAmount.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        labelLessonsAmount.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelLessonsAmount.setText("0 aulas");
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel3.setText("Professores");
 
-        labelProfessors.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        //labelProfessors.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         labelProfessors.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelProfessors.setText("Fulano, Ciclano, Beltrano");
 

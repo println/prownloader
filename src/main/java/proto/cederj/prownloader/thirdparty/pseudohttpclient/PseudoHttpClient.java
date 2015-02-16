@@ -29,4 +29,6 @@ public interface PseudoHttpClient {
     InputStream doGet(String url) throws IOException;
 
     void doDownload(String url, File output, DownloadMonitor monitor) throws IOException;
+    
+    void stopDownload();
 }

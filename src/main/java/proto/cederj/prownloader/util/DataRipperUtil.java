@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import proto.cederj.prownloader.mvp.model.Course;
 import proto.cederj.prownloader.mvp.model.Lesson;
@@ -39,9 +37,20 @@ import proto.cederj.prownloader.thirdparty.rio.FacadeRioXmlDecompiler;
  */
 public class DataRipperUtil {
 
+    private boolean isDownloading;
+    private final Config config;
+    private final PseudoHttpClient client;
+    private final RioServerResolver resolver;
+    private final WebRipper ripper;
+
+    public DataRipperUtil() {
+        this.config = new Config();
+        this.client = new GenericPseudoHttpClient(config.getUserAgent());
+        this.resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
+        this.ripper = new CederjWebRipper(config.getUserAgent());
+    }
+
     public List<Course> getIndexFromCederj() throws Exception {
-        Config config = new Config();
-        WebRipper ripper = new CederjWebRipper(config.getUserAgent());
         List<Course> courses = ripper.extractFrom(config.getTracker(), config.getTrackerElement());
         return courses;
     }
@@ -60,9 +69,6 @@ public class DataRipperUtil {
     }
 
     public void getMetadataFromRio(Lesson lesson) throws Exception {
-        Config config = new Config();
-        PseudoHttpClient client = new GenericPseudoHttpClient(config.getUserAgent());
-        RioServerResolver resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
         String xml = resolver.getDefaultXml(lesson.getSourceUrl());
         InputStream is = client.doGet(xml);
         FacadeRioXmlDecompiler decompile = new FacadeRioXmlDecompiler(is);
@@ -83,42 +89,53 @@ public class DataRipperUtil {
     }
 
     public void getVideoFileFromRio(Course course, DownloadMonitor monitor) throws Exception {
+        isDownloading = true;
         String foldername = course.getDefaultFolder();
 
         List<Lesson> lessons = course.getLessons();
         for (Lesson lesson : lessons) {
+            if (!isDownloading) {
+                break;
+            }
             getVideoFileFromRio(lesson, foldername, monitor);
         }
+        isDownloading = false;
     }
 
     public void getVideoFileFromRio(Lesson lesson, String foldername, DownloadMonitor monitor) throws Exception {
-        Config config = new Config();
-        PseudoHttpClient client = new GenericPseudoHttpClient(config.getUserAgent());
-        RioServerResolver resolver = new RioServerResolver(client, config.getRioRedirect(), config.getRioTransfer(), config.getRioServerMirrorXmlTagname());
-
+        isDownloading = true;
         Video video = lesson.getRelatedVideos().get(0);
         String videoFileName = video.getFilename();
         String videoUrl = resolver.getFile(lesson.getSourceUrl(), videoFileName);
         String[] temp = videoFileName.split("\\.");
         String localVideoFilename = temp[0] + " - " + StringUtils.stripAccents(lesson.getTitle()) + "." + temp[1];
-        video.setLocalFilename(localVideoFilename);
-        
-        
+
         File folder = getFolder(foldername);
         if (!folder.exists()) {
             folder.mkdir();
         }
         File videoFile = new File(folder, localVideoFilename);
 
-        client.doDownload(videoUrl, videoFile, monitor);
-
-        Course course = lesson.getCourse();
-        course.markVideoDownloadDate();
+        if (isDownloading) {
+            client.doDownload(videoUrl, videoFile, monitor);
+        }
+        
+        if (isDownloading) {
+            video.setLocalFilename(localVideoFilename);
+            Course course = lesson.getCourse();
+            course.markVideoDownloadDate();
+        }
+        isDownloading = false;
     }
 
     public File getFolder(String foldername) throws URISyntaxException {
         File base = new File(Config.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
         File folder = new File(base, foldername);
         return folder;
+    }
+
+    public void stopDownload() {
+        isDownloading = false;
+        client.stopDownload();
     }
 }

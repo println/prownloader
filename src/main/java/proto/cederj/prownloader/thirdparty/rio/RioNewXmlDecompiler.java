@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -92,9 +97,9 @@ public class RioNewXmlDecompiler implements RioXmlDecompiler {
         XPathExpression roleexpr = xpath.compile("role");
         XPathExpression entityexpr = xpath.compile("entity");
         NodeList nodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
-        
+
         List<String> professors = new ArrayList<>();
-        
+
         for (int i = 0; i < nodes.getLength(); i++) {
             Node n = nodes.item(i);
             NodeList ns = (NodeList) roleexpr.evaluate(n, XPathConstants.NODESET);
@@ -117,7 +122,16 @@ public class RioNewXmlDecompiler implements RioXmlDecompiler {
         XPathExpression expr = xpath.compile("/OBAA_Videoaula/technical/duration/text()");
         NodeList nodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
         if (nodes.item(0) != null) {
-            return nodes.item(0).getTextContent();
+            String durationString = nodes.item(0).getTextContent();
+            try {
+                
+                Duration duration = DatatypeFactory.newInstance().newDuration(durationString);
+               
+                
+                return ""+String.format("%02d", duration.getHours())+":"+String.format("%02d", duration.getMinutes())+":"+String.format("%02d", duration.getSeconds());
+            } catch (DatatypeConfigurationException ex) {
+                Logger.getLogger(RioNewXmlDecompiler.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return null;
     }

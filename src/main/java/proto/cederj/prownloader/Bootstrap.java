@@ -19,10 +19,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import proto.cederj.prownloader.mvp.presenter.DialogPresenter;
+import proto.cederj.prownloader.mvp.presenter.DynamicDialogPresenter;
 import proto.cederj.prownloader.mvp.presenter.MainPresenter;
+import proto.cederj.prownloader.mvp.presenter.impl.DialogPresenterImpl;
+import proto.cederj.prownloader.mvp.presenter.impl.DynamicDialogPresenterImpl;
 import proto.cederj.prownloader.mvp.presenter.impl.MainPresenterImpl;
+import proto.cederj.prownloader.mvp.view.DialogView;
+import proto.cederj.prownloader.mvp.view.DynamicDialogView;
 import proto.cederj.prownloader.mvp.view.MainView;
+import proto.cederj.prownloader.mvp.view.swing.DynamicDialogSwing;
 import proto.cederj.prownloader.mvp.view.swing.MainWindowSwing;
+import proto.cederj.prownloader.mvp.view.swing.SimpleDialogSwing;
 import proto.cederj.prownloader.persistence.jpa.JpaDaoFactory;
 
 /**
@@ -41,7 +49,13 @@ public class Bootstrap implements AutoCloseable {
             factory = JpaDaoFactory.newInstance(emf);
             
             MainView view = new MainWindowSwing();
-            presenter = new MainPresenterImpl(factory, view);
+            
+            DialogView dialogView = new SimpleDialogSwing((MainWindowSwing)view);
+            DialogPresenter dialog = new DialogPresenterImpl(dialogView);
+            DynamicDialogView dynamicDialogView = new DynamicDialogSwing((MainWindowSwing)view);
+            DynamicDialogPresenter dynamicDialog = new DynamicDialogPresenterImpl(dynamicDialogView);
+            
+            presenter = new MainPresenterImpl(factory, view, dialog, dynamicDialog);
 
         } catch (Exception ex) {
             Logger.getLogger(Bootstrap.class.getName()).log(Level.SEVERE, null, ex);

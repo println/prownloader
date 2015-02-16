@@ -95,21 +95,21 @@ public class LessonPanelSwing extends javax.swing.JPanel implements LessonView {
                 .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        setMaximumSize(new java.awt.Dimension(400, 300));
+        setPreferredSize(new java.awt.Dimension(500, 300));
 
-        labelLessonTitle.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        //labelLessonTitle.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         labelLessonTitle.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelLessonTitle.setText("Título da aula");
 
-        labelDuration.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelDuration.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        //labelDuration.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        labelDuration.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelDuration.setText("tempo da aula");
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel3.setText("Professores");
 
-        labelProfessors.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        //labelProfessors.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         labelProfessors.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelProfessors.setText("Fulano, Ciclano, Beltrano");
 

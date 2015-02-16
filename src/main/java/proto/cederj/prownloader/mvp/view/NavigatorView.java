@@ -16,10 +16,14 @@
 
 package proto.cederj.prownloader.mvp.view;
 
+import java.util.List;
+import proto.cederj.prownloader.mvp.view.swing.treemodel.CourseNode;
+
 /**
  *
  * @author Felipe Santos <live.proto at hotmail.com>
  */
 public interface NavigatorView {
-    
+    void setNavigationList(List<CourseNode> nodes);
+    void updateNavigationList(CourseNode node);
 }

@@ -20,12 +20,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
@@ -34,16 +36,24 @@ import org.apache.http.impl.client.HttpClientBuilder;
  */
 public class GenericPseudoHttpClient implements PseudoHttpClient {
 
-    private HttpClient client;
+    private boolean isDownloading;
+    private String userAgent;
+    private CloseableHttpClient client;
 
     public GenericPseudoHttpClient(String userAgent) {
+        this.userAgent = userAgent;
+        this.client = getClient();
+    }
+
+    public CloseableHttpClient getClient() {
         HttpClientBuilder builder = HttpClientBuilder.create();
         builder.setUserAgent(userAgent);
-        this.client = builder.build();
+        return builder.build();
     }
 
     @Override
     public InputStream doGet(String url) throws IOException {
+        //CloseableHttpClient client = getClient();
         HttpGet get = new HttpGet(url);
         HttpResponse response = client.execute(get);
 
@@ -59,10 +69,12 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
 
     @Override
     public void doDownload(String url, File output, DownloadMonitor monitor) throws IOException {
+        isDownloading = true;
+        CloseableHttpClient client = getClient();
         monitor = new DownloadMonitorWrapper(monitor);
 
         HttpGet get = new HttpGet(url);
-        HttpResponse response = client.execute(get);
+        CloseableHttpResponse response = client.execute(get);
 
         HttpEntity entity = null;
 
@@ -77,15 +89,15 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
         if (headers.length > 0) {
             fileSize = headers[0].getValue();
         }
-        
+
         int size = -1;
         if (fileSize != null) {
             size = Integer.parseInt(fileSize);
         }
-        
+
         if (output.exists()) {
             //do not remove/redownload file if it is correct
-            if(output.length() == size){
+            if (output.length() == size) {
                 monitor.status(size, size, 100, url);
                 return;
             }
@@ -98,7 +110,7 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
         CountingInputStream count = new CountingInputStream(entity.getContent());
 
         int percent = 0;
-        while ((read = count.read(bytes)) != -1) {
+        while ((read = count.read(bytes)) != -1 && isDownloading) {
             outputStream.write(bytes, 0, read);
             int current = count.getCount();
 
@@ -112,5 +124,19 @@ public class GenericPseudoHttpClient implements PseudoHttpClient {
                 monitor.status(size, current, percent, url);
             }
         }
+        outputStream.close();
+        response.close();
+        
+        count.close();
+        client.close();
+        if(!isDownloading){
+            FileDeleteStrategy.FORCE.delete(output);
+        }        
+        isDownloading = false;
+    }
+
+    @Override
+    public void stopDownload() {
+        isDownloading = false;
     }
 }
