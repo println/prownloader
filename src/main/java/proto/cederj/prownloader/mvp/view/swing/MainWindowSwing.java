@@ -102,10 +102,12 @@ public class MainWindowSwing extends javax.swing.JFrame implements MainView {
     }
 
     private JTree getTree(TreeModel model) {
+        //https://community.oracle.com/thread/1478720
         final JTree jTree = new JTree(model);
         jTree.setRootVisible(false);
         jTree.setShowsRootHandles(true);
         jTree.setLargeModel(true);
+        jTree.setRowHeight(18);
         jTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         jTree.addTreeSelectionListener(new TreeSelectionListener() {

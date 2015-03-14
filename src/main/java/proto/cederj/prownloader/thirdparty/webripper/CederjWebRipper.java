@@ -18,6 +18,7 @@ package proto.cederj.prownloader.thirdparty.webripper;
 import proto.cederj.prownloader.mvp.model.Course;
 import proto.cederj.prownloader.mvp.model.Lesson;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import org.jsoup.Jsoup;
@@ -39,6 +40,7 @@ public class CederjWebRipper implements WebRipper<Course> {
 
     @Override
     public List<Course> extractFrom(String url, String htmlElement) throws IOException {
+        //ping(url);
         Document d = Jsoup.connect(url).userAgent(userAgent).get();
         Elements e = d.select(htmlElement);
         List<Course> courses = new ArrayList<>();

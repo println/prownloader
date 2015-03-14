@@ -4,7 +4,7 @@
 
     <groupId>proto</groupId>
     <artifactId>Prownloader</artifactId>
-    <version>0.1</version>
+    <version>0.11</version>
     <packaging>jar</packaging>
 
     <name>Prownloader</name>

@@ -24,4 +24,6 @@ public interface DynamicDialogView extends DialogView {
     void setActionListener(DynamicDialogActionListener listener);
 
     void setDynamicMessage(String message);
+    
+    void setButtonLabel(String label);
 }

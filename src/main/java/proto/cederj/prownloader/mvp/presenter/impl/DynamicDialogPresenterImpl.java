@@ -36,6 +36,12 @@ public class DynamicDialogPresenterImpl implements DynamicDialogPresenter, Dynam
     }
 
     @Override
+    public void setButtonLabel(String label) {
+        view.setButtonLabel(label);
+    }
+    
+
+    @Override
     public void setWindowTitle(String title) {
         view.setWindowTitle(title);
     }

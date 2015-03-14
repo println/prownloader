@@ -61,11 +61,13 @@ public class MainPresenterImpl implements MainPresenter {
         CourseDao dao = factory.getCourseDao();
         List<Course> courses = dao.getAll();
         if (courses.isEmpty()) {
-            startThreadToGetIndexFromCederj();
-            courses = dao.getAll();
-            if(courses.isEmpty()){
+            try {
+                startThreadToGetIndexFromCederj();
+            }catch(IOException ioe){
+                startToCloseApp();
                 System.exit(0);
             }
+            courses = dao.getAll();            
         }
         view.setMainPresenter(this);
         showNavigation(courses);
@@ -243,7 +245,8 @@ public class MainPresenterImpl implements MainPresenter {
         return file;
     }
 
-    private void startThreadToGetIndexFromCederj() {
+    private void startThreadToGetIndexFromCederj() throws IOException {
+        final Exception exception = new Exception();
         Runnable run = new Runnable() {
             @Override
             public void run() {
@@ -253,8 +256,8 @@ public class MainPresenterImpl implements MainPresenter {
                     for (Course course : courses) {
                         dao.save(course);
                     }
-                } catch (Exception ex) {
-                    Logger.getLogger(MainPresenterImpl.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception e) {
+                    exception.addSuppressed(e);
                 } finally {
                     dialog.close();
                 }
@@ -267,6 +270,15 @@ public class MainPresenterImpl implements MainPresenter {
         dialog.setWindowTitle("Downloading Index...");
         dialog.setInfo("Recuperando dados do site do CEDERJ...");
         dialog.show();
+
+        try {
+            Throwable throwable = exception.getSuppressed()[0];
+            if (throwable != null && throwable instanceof IOException) {
+                throw (IOException) throwable;
+            }
+        } catch (RuntimeException e) {
+        }
+
     }
 
     private void startThreadToGetCourseMetadata(final long id) {
@@ -466,5 +478,20 @@ public class MainPresenterImpl implements MainPresenter {
         dynamicDialog.setInfo("Baixando vídeo do RIO Server(RNP)...");
         dynamicDialog.show();
 
+    }
+    
+    private void startToCloseApp() {
+        dynamicDialog.setDynamicCallbackListener(new DynamicDialogCallbackListener() {
+            @Override
+            public void onCancel() {
+                running = false;                
+                dynamicDialog.close();
+            }
+        });
+        dynamicDialog.setWindowTitle("Sem conexão à internet...");
+        dynamicDialog.setInfo("Site do CEDERJ não pode ser acessado!");
+        dynamicDialog.setDynamicMessage("Aplicativo será fechado!");
+        dynamicDialog.setButtonLabel("Fechar");
+        dynamicDialog.show();
     }
 }

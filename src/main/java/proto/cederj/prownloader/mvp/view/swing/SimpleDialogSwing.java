@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import proto.cederj.prownloader.mvp.view.DialogView;
-import proto.cederj.prownloader.mvp.view.MainView;
 
 /**
  *
@@ -46,7 +45,7 @@ public class SimpleDialogSwing extends JDialog implements DialogView {
         this.setSize(300, 200);
         this.setResizable(false);
         this.setLocationRelativeTo(view);
-        this.setTitle("Tree");
+        this.setTitle("SimpleDialog");
         this.setContentPane(getJContentPane());
         //this.setUndecorated(true);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

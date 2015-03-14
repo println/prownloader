@@ -41,7 +41,7 @@ public class DynamicDialogSwing extends JDialog implements DynamicDialogView {
     private JLabel jLabelMessage;
     private JPanel jPanelCenter;
     private DynamicDialogActionListener listener;
-    private JButton jButtonCancel;
+    private JButton jButtonAction;
 
     public DynamicDialogSwing(JFrame view) {
         super();
@@ -53,7 +53,7 @@ public class DynamicDialogSwing extends JDialog implements DynamicDialogView {
         this.setSize(300, 200);
         this.setResizable(false);
         this.setLocationRelativeTo(view);
-        this.setTitle("Tree");
+        this.setTitle("DynamicDialog");
         this.setContentPane(getCenteredContentPanel());
         //this.setUndecorated(true);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -103,17 +103,17 @@ public class DynamicDialogSwing extends JDialog implements DynamicDialogView {
     }
 
     private JButton getJButtonCancel() {
-        if (jButtonCancel == null) {
-            jButtonCancel = new JButton();
-            jButtonCancel.setText("Cancelar");
-            jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+        if (jButtonAction == null) {
+            jButtonAction = new JButton();
+            jButtonAction.setText("Cancelar");
+            jButtonAction.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     onCancel();
                 }
             });
         }
-        return jButtonCancel;
+        return jButtonAction;
     }
 
     private void onCancel() {
@@ -154,4 +154,9 @@ public class DynamicDialogSwing extends JDialog implements DynamicDialogView {
         jLabelMessage.setText(message);
     }
 
+    @Override
+    public void setButtonLabel(String label) {
+        jButtonAction.setText(label);
+    }
+    
 }

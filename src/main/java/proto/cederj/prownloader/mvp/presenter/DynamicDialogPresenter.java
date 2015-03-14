@@ -24,4 +24,6 @@ public interface DynamicDialogPresenter extends DialogPresenter {
     void setDynamicMessage(String message);
 
     void setDynamicCallbackListener(DynamicDialogCallbackListener listener);
+    
+    void setButtonLabel(String label);
 }
