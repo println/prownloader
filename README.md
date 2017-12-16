@@ -11,7 +11,7 @@ Utilitário para download automático das vídeo-aulas!
 - HSQLDB
 - MAVEN
 - Web Client
--Linux and Windows
+- Linux and Windows
 
 
 ## Changelog:
