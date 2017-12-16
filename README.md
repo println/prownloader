@@ -3,13 +3,15 @@ Prownloader
 
 Utilitário para download automático das vídeo-aulas!
 
-### Tecnologias:
-- Java
+### Tecnology
+- Java 7
 - Swing
 - Hibernate
 - JPA2
 - HSQLDB
 - MAVEN
+- Web Client
+-Linux and Windows
 
 
 ## Changelog:
