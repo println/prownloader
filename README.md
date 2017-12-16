@@ -8,7 +8,8 @@ Utilitário para download automático das vídeo-aulas!
 - Swing
 - Hibernate
 - JPA2
-- HSQLDB 
+- HSQLDB
+- MAVEN
 
 
 ## Changelog:
