@@ -5,7 +5,7 @@ Utilitário para download automático das vídeo-aulas!
 
 ### Tecnology
 - Java 7
-- Swing
+- Swing (windows/linux desktop app)
 - Hibernate
 - JPA2
 - HSQLDB
